@@ -1,0 +1,10 @@
+[project]
+name = "spotdl-rect"
+version = "0.1.0"
+description = "A webserver that handles spotify paths to automatically download the songs, albums and playlists using spotdl."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "readerwriterlock>=1.0.9",
+    "spotdl>=4.4.2",
+]

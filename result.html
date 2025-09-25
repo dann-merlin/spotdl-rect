@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>SpotDL-rect</title>
+		<link rel="stylesheet" href="style.css">
+	</head>
+	<body>
+		<div id="status">Loading...</div>
+		<div>What do you want to add next?</div>
+		<input type="text" id="inputText" placeholder="Feed me a link" onkeypress="handleKeyPress(event)">
+		<button onclick="sendRequest()">Add</button>
+		<div id="message" style="color: red; display: none;"></div>
+
+		<script>
+		var intervalid = null;
+
+		function handleKeyPress(event) {
+		    if (event.key === "Enter") {
+		        sendRequest();
+		    }
+		}
+		
+		function sendRequest() {
+		    const inputText = document.getElementById('inputText').value;
+			console.log(inputText);
+		
+		    // Remove any protocol and domain from the input text
+		    let cleanedInput = inputText.replace(/^(https?:\/\/[^\/]+)?/, '');
+			console.log(cleanedInput);
+		
+		    // Ensure the path starts with a '/'
+		    if (!cleanedInput.startsWith('/')) {
+		        cleanedInput = '/' + cleanedInput;
+		    }
+
+			console.log(cleanedInput);
+		
+		    if (/^[a-zA-Z0-9/]*$/.test(cleanedInput)) {
+				console.log(`setting href to ${cleanedInput}`)
+		        window.location.href = cleanedInput;
+		    } else {
+		        document.getElementById('message').innerText = "Invalid input: Only alphanumeric characters and slashes are allowed.";
+		        document.getElementById('message').style.display = 'block';
+		    }
+		}
+
+		function setStatusText(text) {
+			const statusDiv = document.getElementById('status');
+			statusDiv.innerText = text;
+		}
+
+		function refresh_status() {
+			const currentPath = window.location.pathname;
+			if (currentPath === '/') {
+				setStatusText("")
+				return;
+			}
+			const statusDiv = document.getElementById('status');
+
+			fetch(`/status?req=${encodeURIComponent(currentPath)}`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			})
+				.then(response => () {
+					// TODO do error checking here
+					return response.json()
+				})
+				.then(data => {
+					if (data.status === "done") {
+						statusDiv.innerText = "Operation successful!";
+						console.log("Status: Success");
+						statusDiv.classList.remove("processing");
+						clearInterval(intervalid);
+					} else if (data.status === "error") {
+						statusDiv.innerText = "An error occurred.";
+						statusDiv.classList.remove("processing");
+						clearInterval(intervalid);
+						console.error("Status: Error");
+					} else if (data.status === "ongoing") {
+						statusDiv.innerText = "Processing...";
+						statusDiv.classList.add("processing");
+						console.info("Status: In Progress");
+					}
+				})
+				.catch(error => {
+					statusDiv.innerText = "An error occurred: " + error;
+					statusDiv.classList.remove("processing");
+					clearInterval(intervalid);
+					console.error("Error:", error);
+				});
+		};
+
+		window.onload = function() {
+			refresh_status();
+			intervalid = setInterval(refresh_status, 1000);
+		}
+		</script>
+	</body>
+</html>
