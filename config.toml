@@ -1,0 +1,3 @@
+output_dir = "./out"
+spotify_cache_path = "./spotify.cache"
+spotdl_save_file = "./save.spotdl"
