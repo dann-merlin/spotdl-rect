@@ -74,11 +74,13 @@ class StateEnum(JsonEnum):
     ongoing = 'ongoing'
     done = 'done'
     error = 'error'
+    unknown = 'unknown'
 
 class SpotDLRectState:
     def __init__(self) -> None:
         self.errored: set[str] = set()
         self.done: set[str] = set()
+        self.ongoing: set[str] = set()
         self.lock: RWLockFair = RWLockFair()
 
     def get_state_for_target(self, target: str) -> StateEnum:
@@ -87,26 +89,42 @@ class SpotDLRectState:
                 return StateEnum.done
             if target in self.errored:
                 return StateEnum.error
-            return StateEnum.ongoing
+            if target in self.ongoing:
+                return StateEnum.ongoing
+            return StateEnum.unknown
 
     def set_error(self, target: str):
         with self.lock.gen_wlock():
+            self.done.remove(target)
+            self.ongoing.remove(target)
             self.errored.add(target)
 
     def set_done(self, target: str):
         with self.lock.gen_wlock():
+            self.ongoing.remove(target)
+            self.errored.remove(target)
             self.done.add(target)
+
+    def set_ongoing_if_unknown(self, target: str) -> bool:
+        with self.lock.gen_wlock():
+            if self.__is_known_unsecure(target):
+                return False
+            self.ongoing.add(target)
+            return True
 
     def is_known(self, target: str) -> bool:
         with self.lock.gen_rlock():
-            return target in self.done or target in self.errored
+            return self.__is_known_unsecure(target)
+
+    def __is_known_unsecure(self, target: str) -> bool:
+        return target in self.ongoing or target in self.done or target in self.errored
 
 states = SpotDLRectState()
 
 add_lock = Lock()
 def try_add(path: str):
     with add_lock:
-        if states.is_known(path):
+        if not states.set_ongoing_if_unknown(path):
             return
         spotify_link = 'https://open.spotify.com' + path
         proc = run([
