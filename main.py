@@ -21,8 +21,8 @@ DEFAULTS: dict[str, str] = {
     "listen_ip": "127.0.0.1",
 }
 
-def load_config(config_file: str = "config.toml") -> dict[str, Path]:
-    config_data: dict[str, Path] = {}
+def load_config(config_file: str = "config.toml") -> dict[str, str]:
+    config_data: dict[str, str] = {}
 
     try:
         with open(config_file, 'rb') as f:
@@ -32,12 +32,12 @@ def load_config(config_file: str = "config.toml") -> dict[str, Path]:
 
     for key, default in DEFAULTS.items():
         value = parsed.get(key, default)
-        config_data[key] = Path(value)
+        config_data[key] = value
     return config_data
 
 config = load_config()
 
-OUTPUT_PATH_FORMAT = config['output_dir'] / '{album-artist}/{album}/{track-number}-{title}.{output-ext}'
+OUTPUT_PATH_FORMAT = Path(config['output_dir']) / '{album-artist}/{album}/{track-number}-{title}.{output-ext}'
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 
@@ -216,4 +216,4 @@ def start_server(ip: str, port: int):
 
 if __name__ == "__main__":
     log.setLevel(logging.INFO)
-    start_server("127.0.0.1", 8080)
+    start_server(config['listen_ip'], 8080)
