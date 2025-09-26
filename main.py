@@ -132,6 +132,7 @@ class SpotDLRectHandler(BaseHTTPRequestHandler):
             return
         if parsed.path == '/style.css':
             self.send_css()
+            return
         self.send_html(get_html_file())
         if is_valid_path_check(parsed.path):
             Thread(target=try_add, args=(parsed.path,), daemon=False).start()
