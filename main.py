@@ -93,16 +93,22 @@ class SpotDLRectState:
                 return StateEnum.ongoing
             return StateEnum.unknown
 
+    def safe_rm_set(self, s: set[str], target: str):
+        try:
+            s.remove(target)
+        except KeyError:
+            pass
+
     def set_error(self, target: str):
         with self.lock.gen_wlock():
-            self.done.remove(target)
-            self.ongoing.remove(target)
+            self.safe_rm_set(self.done, target)
+            self.safe_rm_set(self.ongoing, target)
             self.errored.add(target)
 
     def set_done(self, target: str):
         with self.lock.gen_wlock():
-            self.ongoing.remove(target)
-            self.errored.remove(target)
+            self.safe_rm_set(self.ongoing, target)
+            self.safe_rm_set(self.errored, target)
             self.done.add(target)
 
     def set_ongoing_if_unknown(self, target: str) -> bool:
