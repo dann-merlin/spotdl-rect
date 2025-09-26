@@ -143,7 +143,7 @@ def try_add(path: str):
             '--audio', 'piped',
             '--audio', 'youtube',
             '--overwrite', 'skip',
-            '--fetch-albums',
+            # '--fetch-albums',
             '--save-file', config['spotdl_save_file'],
             '--create-skip-file', '--respect-skip-file',
             '--output', str(OUTPUT_PATH_FORMAT),
