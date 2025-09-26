@@ -17,7 +17,8 @@ import tomllib
 DEFAULTS: dict[str, str] = {
     "output_dir": './out',
     "spotify_cache_path": './spotify.cache',
-    "spotdl_save_file": "./save.spotdl"
+    "spotdl_save_file": "./save.spotdl",
+    "listen_ip": "127.0.0.1",
 }
 
 def load_config(config_file: str = "config.toml") -> dict[str, Path]:

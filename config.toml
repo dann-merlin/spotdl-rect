@@ -1,3 +1,4 @@
 output_dir = "./out"
 spotify_cache_path = "./spotify.cache"
 spotdl_save_file = "./save.spotdl"
+listen_ip = "0.0.0.0"
