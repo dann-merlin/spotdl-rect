@@ -1,6 +1,6 @@
 FROM alpine:latest
 
-RUN apk add uv
+RUN apk add uv ffmpeg
 RUN uv tool install spotdl
 
 WORKDIR /app
