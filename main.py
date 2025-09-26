@@ -19,6 +19,7 @@ DEFAULTS: dict[str, str] = {
     "spotify_cache_path": './spotify.cache',
     "spotdl_save_file": "./save.spotdl",
     "listen_ip": "127.0.0.1",
+    "spotdl_args": "",
 }
 
 def load_config(config_file: str = "config.toml") -> dict[str, str]:
@@ -36,6 +37,8 @@ def load_config(config_file: str = "config.toml") -> dict[str, str]:
     return config_data
 
 config = load_config()
+
+spotdl_args: list[str] = list(filter(lambda s: s != '', config['spotdl_args'].split('|')))
 
 OUTPUT_PATH_FORMAT = Path(config['output_dir']) / '{album-artist}/{album}/{track-number}-{title}.{output-ext}'
 
@@ -108,9 +111,13 @@ def try_add(path: str):
         spotify_link = 'https://open.spotify.com' + path
         proc = run([
             'spotdl',
+           ] + spotdl_args + [
             '--cache-path', config['spotify_cache_path'],
             '--use-cache-file',
             '--scan-for-songs',
+            '--audio', 'youtube-music',
+            '--audio', 'piped',
+            '--audio', 'youtube',
             '--overwrite', 'skip',
             '--fetch-albums',
             '--save-file', config['spotdl_save_file'],
