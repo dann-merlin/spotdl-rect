@@ -26,6 +26,7 @@
 		
 		    // Remove any protocol and domain from the input text
 		    let cleanedInput = inputText.replace(/^(https?:\/\/[^\/]+)?/, '');
+		    cleanedInput = cleanedInput.replace(/\?.*$/, '');
 			console.log(cleanedInput);
 		
 		    // Ensure the path starts with a '/'
