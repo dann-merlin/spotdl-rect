@@ -65,6 +65,9 @@
 				}
 			})
 				.then(response => {
+					if (response.status === 502) {
+						return Promise.reject("ignore-502");
+					}
 				    if (!response.ok) {
 				        throw new Error('Network response was not ok ' + response.statusText);
 				    }
@@ -88,6 +91,9 @@
 					}
 				})
 				.catch(error => {
+					if (error === "ignore-502") {
+						return;
+					}
 					statusDiv.innerText = "An error occurred: " + error;
 					statusDiv.classList.remove("processing");
 					clearInterval(intervalid);
