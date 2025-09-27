@@ -172,10 +172,13 @@ def load_save_spotdl():
     spotify_tld = "https://open.spotify.com"
     saves = json.loads(Path(config['spotdl_save_file']).read_text())  # pyright:ignore[reportAny]
     for save in saves:  # pyright:ignore[reportAny]
-        target: str = save["url"][len(spotify_tld):]
-        album: str = save["album"]
-        album_artist: str = save["album_artist"]
-        track_number: str = save["track_number"]
+        try:
+            target: str = save["url"][len(spotify_tld):]
+            album: str = save["album_name"]
+            album_artist: str = save["album_artist"]
+            track_number: str = save["track_number"]
+        except KeyError:
+            continue
         expected_out = Path(str(OUTPUT_PATH_FORMAT).replace('{album-artist}', album_artist) \
                                               .replace('{album}', album) \
                                               .replace('{track-number}', track_number) \
