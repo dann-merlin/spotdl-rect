@@ -143,7 +143,6 @@ if done_path.exists():
 else:
     states = SpotDLRectState()
 
-
 add_lock = Lock()
 def try_add(path: str):
     with add_lock:
@@ -167,6 +166,25 @@ def try_add(path: str):
             states.set_error(path)
             return
         states.set_done(path)
+        load_save_spotdl()
+
+def load_save_spotdl():
+    spotify_tld = "https://open.spotify.com"
+    saves = json.loads(Path(config['spotdl_save_file']).read_text())  # pyright:ignore[reportAny]
+    for save in saves:  # pyright:ignore[reportAny]
+        target: str = save["url"][len(spotify_tld):]
+        album: str = save["album"]
+        album_artist: str = save["album_artist"]
+        track_number: str = save["track_number"]
+        expected_out = Path(str(OUTPUT_PATH_FORMAT).replace('{album-artist}', album_artist) \
+                                              .replace('{album}', album) \
+                                              .replace('{track-number}', track_number) \
+                                              .replace('{title}.{output-ext}', '*'))
+        try:
+            _ = next(expected_out.parent.glob(expected_out.name))
+            states.set_done(target)
+        except StopIteration:
+            pass
 
 
 class SpotDLRectHandler(BaseHTTPRequestHandler):
