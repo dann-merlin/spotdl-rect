@@ -176,7 +176,7 @@ def load_save_spotdl():
             target: str = save["url"][len(spotify_tld):]
             album: str = save["album_name"]
             album_artist: str = save["album_artist"]
-            track_number: str = save["track_number"]
+            track_number: str = "%02d" % save["track_number"]
         except KeyError:
             continue
         expected_out = Path(str(OUTPUT_PATH_FORMAT).replace('{album-artist}', album_artist) \
