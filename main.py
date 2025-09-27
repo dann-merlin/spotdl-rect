@@ -38,6 +38,8 @@ def load_config(config_file: str = "config.toml") -> dict[str, str]:
 
 config = load_config()
 
+done_path = (Path(config['output_dir']) / '.done')
+
 spotdl_args: list[str] = list(filter(lambda s: s != '', config['spotdl_args'].split('|')))
 
 OUTPUT_PATH_FORMAT = Path(config['output_dir']) / '{album-artist}/{album}/{track-number}-{title}.{output-ext}'
@@ -125,7 +127,22 @@ class SpotDLRectState:
     def __is_known_unsecure(self, target: str) -> bool:
         return target in self.ongoing or target in self.done or target in self.errored
 
-states = SpotDLRectState()
+    @classmethod
+    def from_json(cls, json_str: str) -> "SpotDLRectState":
+        instance = cls()
+        stored: list[str] = json.loads(json_str)
+        instance.done.update(stored)
+        return instance
+
+    def to_json(self) -> str:
+        return json.dumps(list(self.done))
+
+
+if done_path.exists():
+    states = SpotDLRectState.from_json(done_path.read_text())
+else:
+    states = SpotDLRectState()
+
 
 add_lock = Lock()
 def try_add(path: str):
@@ -139,11 +156,8 @@ def try_add(path: str):
             '--cache-path', config['spotify_cache_path'],
             '--use-cache-file',
             '--scan-for-songs',
-            '--audio', 'youtube-music',
-            '--audio', 'piped',
-            '--audio', 'youtube',
             '--overwrite', 'skip',
-            # '--fetch-albums',
+            '--fetch-albums',
             '--save-file', config['spotdl_save_file'],
             '--create-skip-file', '--respect-skip-file',
             '--output', str(OUTPUT_PATH_FORMAT),
@@ -243,6 +257,7 @@ def start_server(ip: str, port: int):
         server.serve_forever()
     except KeyboardInterrupt:
         log.info("Stopping gracefully...")
+        _ = done_path.write_text(states.to_json())
         exit(0)
 
 
