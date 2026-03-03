@@ -8,7 +8,8 @@ build_podman:
 	podman build -t $(IMAGE_NAME) .
 
 run_podman:
-	podman run --rm -it \
+	podman run --rm -it -d \
+		--name spotdl-rect \
 		-p $(PORT):8080 \
 		-v ./config.toml:/app/config.toml \
 		-v "$(OUTPUTDIR):/app/out" \

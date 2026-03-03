@@ -206,12 +206,12 @@ class SpotDLRectHandler(BaseHTTPRequestHandler):
     def do_POST(self):
         parsed = urlparse(self.path)
         queries = parse_qs(parsed.query)
-        log.info('POST: ' + parsed.query)
+        log.debug('POST: ' + parsed.query)
         if parsed.path != '/status':
             self.send_error(404, 'Invalid path')
             return
         targets = queries.get('req')
-        log.info('POST: ' + str(targets))
+        log.debug('POST: ' + str(targets))
         if not targets or len(targets) != 1:
             self.send_error(422, 'You need to specify exactly one req param.')
             return
