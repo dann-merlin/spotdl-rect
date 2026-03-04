@@ -12,6 +12,7 @@ run_podman:
 		--name spotdl-rect \
 		-p $(PORT):8080 \
 		-v ./config.toml:/app/config.toml \
+		-v ./save.spotdl:/app/save.spotdl \
 		-v "$(OUTPUTDIR):/app/out" \
 		$(IMAGE_NAME)
 
