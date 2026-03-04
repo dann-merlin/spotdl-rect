@@ -19,7 +19,7 @@ DEFAULTS: dict[str, str] = {
     "spotify_cache_path": './spotify.cache',
     "spotdl_save_file": "./save.spotdl",
     "listen_ip": "127.0.0.1",
-    "spotdl_args": "",
+    "spotdl_args": "--audio youtube-music",
 }
 
 def load_config(config_file: str = "config.toml") -> dict[str, str]:
