@@ -154,7 +154,7 @@ def try_add(path: str):
            ] + spotdl_args + [
             '--cache-path', config['spotify_cache_path'],
             '--use-cache-file',
-            '--scan-for-songs',
+            # '--scan-for-songs',  # Don't use this. It needs search from spotipy
             '--overwrite', 'skip',
             '--fetch-albums',
             '--save-file', config['spotdl_save_file'],
