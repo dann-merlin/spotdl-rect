@@ -8,3 +8,6 @@ dependencies = [
     "readerwriterlock>=1.0.9",
     "spotdl>=4.4.2",
 ]
+
+[tool.uv.sources]
+spotdl = { git = "https://github.com/merlin-sievers/spotify-downloader-noAPI" }
